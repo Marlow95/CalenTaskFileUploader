@@ -7,13 +7,16 @@
 var app = require('../app');
 var debug = require('debug')('calentaskfileuploader:server');
 var http = require('http');
+const https = require('https');
+const fs = require('fs');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(process.env.PORT || '4500');
 app.set('port', port);
+app.set('secPort', port+120);
 
 /**
  * Create HTTP server.
@@ -21,13 +24,29 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
+/**
+ * Create Https Server.
+ */
+const options = {
+  key: fs.readFileSync(__dirname+'/server.key'),
+  cert: fs.readFileSync(__dirname+'/server.cert')
+}
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+ const secureServer = https.createServer(options, app)
+
+ secureServer.listen(app.get('secPort'), () => {
+   console.log(`Server listening on port`,app.get('secPort'));
+ });
+ secureServer.on('error', onError);
+ secureServer.on('listening', onListening);
+
 
 /**
  * Normalize a port into a number, string, or false.
