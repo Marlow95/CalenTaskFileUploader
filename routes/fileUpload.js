@@ -1,5 +1,6 @@
 const express = require('express');
-const multer = require('multer')
+const multer = require('multer');
+const cors = require('../cors');
 
 const fileUploadRouter = express.Router();
 
@@ -24,25 +25,42 @@ storage, fileFilter: imageFileFilter });
 
 fileUploadRouter.route('/')
 
-.get((req, res, next) => {
-  res.statusCode = 403;
-  res.end('Operation not supported');
+.options(cors.corsWithOptions, (req, res) => res.sendStatus(200))
+.get(cors.cors, (req, res, next) => {
+  try{
+    res.statusCode = 403;
+    res.end('Operation not supported');
+  } catch(err){
+      next(err);
+  }
 })
 
-.post(upload.single('imageFile'),(req, res, next) => {
-  res.statusCode = 201;
-  res.setHeader('Content-Type','application/json');
-  res.json(req.file);
+.post(cors.corsWithOptions, upload.single('imageFile'), (req, res, next) => {
+  try{
+    res.statusCode = 201;
+    res.setHeader('Content-Type','application/json');
+    res.json(req.file);
+  } catch(err){
+      next(err);
+  }
 })
 
-.put((req, res, next) => {
-  res.statusCode = 403;
-  res.end('Operation not supported');
+.put(cors.corsWithOptions, (req, res, next) => {
+  try{
+    res.statusCode = 403;
+    res.end('Operation not supported');
+  } catch(err){
+      next(err);
+  }
 })
 
-.delete((req, res, next) => {
-  res.statusCode = 403;
-  res.end('Operation not supported');
+.delete(cors.corsWithOptions, (req, res, next) => {
+  try{
+    res.statusCode = 403;
+    res.end('Operation not supported');
+  } catch(err){
+      next(err);
+  }
 });
 
 module.exports = fileUploadRouter;
